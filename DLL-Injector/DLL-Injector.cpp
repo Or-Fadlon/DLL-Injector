@@ -11,7 +11,7 @@ bool InjectDLL(DWORD procID, const char* dllPath)
 	// the length of the dll path
 	int dllPathLen = strlen(dllPath) + 1;
 
-	// get process handler
+	// get process handle
 	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, procID);
 	if (hProcess == INVALID_HANDLE_VALUE)
 		return false;
@@ -41,7 +41,7 @@ bool InjectDLL(DWORD procID, const char* dllPath)
 		return false;
 	}
 
-	// free and close handlers
+	// free and close handles
 	WaitForSingleObject(hThread, INFINITE);
 	VirtualFreeEx(hProcess, exMemory, NULL, MEM_RELEASE);
 	CloseHandle(hProcess);
