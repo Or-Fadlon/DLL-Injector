@@ -51,19 +51,24 @@ bool InjectDLL(DWORD procID, const char* dllPath)
 
 bool UnloadDLL(DWORD procID, const char* dllPath)
 {
-	MODULEENTRY32 entry = { sizeof(MODULEENTRY32) };
+	MODULEENTRY32 entry = {sizeof(MODULEENTRY32)};
 	HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, procID);
 
-	if (Module32First(snapshot, &entry) == TRUE) {
-		while (Module32Next(snapshot, &entry) == TRUE) {
-			if (lstrcmpi(entry.szModule, dllPath) == 0 || lstrcmpi(entry.szExePath, dllPath) == 0) {
+	if (Module32First(snapshot, &entry) == TRUE)
+	{
+		while (Module32Next(snapshot, &entry) == TRUE)
+		{
+			if (lstrcmpi(entry.szModule, dllPath) == 0 || lstrcmpi(entry.szExePath, dllPath) == 0)
+			{
 				// get the handle to the process
 				HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, procID);
 				if (hProcess == INVALID_HANDLE_VALUE)
 					return false;
 				// FreeLibrary the librery
-				HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)FreeLibrary, entry.modBaseAddr, 0, NULL);
-				if (!hThread) {
+				HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)FreeLibrary,
+				                                    entry.modBaseAddr, 0, NULL);
+				if (!hThread)
+				{
 					CloseHandle(hProcess);
 					return false;
 				}
@@ -143,23 +148,29 @@ int main(int argc, char* argv[])
 			std::cout << "Selected dll file does not exist" << std::endl;
 			return 1;
 		}
-		if (lstrcmpi(operation, injectString) == 0) {
-			bool injectionSuccess = InjectDLL((DWORD)pid, dllPath);
+		// get dll absolute path
+		char dllFullPath[MAX_PATH + 1];
+		GetFullPathName(dllPath, MAX_PATH + 1, dllFullPath, nullptr);
+		if (lstrcmpi(operation, injectString) == 0)
+		{
+			bool injectionSuccess = InjectDLL((DWORD)pid, dllFullPath);
 			if (injectionSuccess)
 				std::cout << "DLL injected successfully" << std::endl;
 			else
 				std::cout << "DLL injection error" << std::endl;
 			return !injectionSuccess;
 		}
-		else if (lstrcmpi(operation, hideString) == 0) {
-			bool hideSuccess = UnloadDLL((DWORD)pid, dllPath);
+		else if (lstrcmpi(operation, hideString) == 0)
+		{
+			bool hideSuccess = UnloadDLL((DWORD)pid, dllFullPath);
 			if (hideSuccess)
 				std::cout << "DLL unloaded successfully" << std::endl;
 			else
 				std::cout << "DLL unload error" << std::endl;
 			return !hideSuccess;
 		}
-		else {
+		else
+		{
 			std::cout << "Operation Error..." << std::endl;
 			return 1;
 		}
