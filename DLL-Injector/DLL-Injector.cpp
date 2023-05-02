@@ -119,25 +119,26 @@ bool FileExists(const std::string& filename)
 int main(int argc, char* argv[])
 {
 	const char injectString[] = "inject";
-	const char hideString[] = "hide";
+	const char unloadString[] = "unload";
 	try
 	{
 		if (argc != 4)
 		{
-			std::cout << std::endl << "Usage: " << argv[0] << "<Operation> <PID> <DLL-Path>" << std::endl;
+			std::cout << "Usage: " << argv[0] << " <Operation> <PID> <DLL-Path>" << std::endl;
 			std::cout << "	- <Operation>: inject / hide" << std::endl;
 			std::cout << "	- <PID>:	   Process id of running process" << std::endl;
 			std::cout << "	- <DLL-Path>:  Path to DLL" << std::endl;
 			return 1;
 		}
 		char* operation = argv[1];
-		if (lstrcmpi(operation, injectString) != 0 && lstrcmpi(operation, hideString) != 0)
+		if (lstrcmpi(operation, injectString) != 0 && lstrcmpi(operation, unloadString) != 0)
 		{
-			std::cout << "Operation can be 'inject' or 'hide'" << std::endl;
+			std::cout << "Operation can be 'inject' or 'unload'" << std::endl;
 			return 1;
 		}
 		int pid = atoi(argv[2]);
-		if (GetProcessName(pid) == NULL)
+		char* processName = GetProcessName(pid);
+		if (processName == NULL)
 		{
 			std::cout << "Process ID is not of a running process" << std::endl;
 			return 1;
@@ -151,16 +152,20 @@ int main(int argc, char* argv[])
 		// get dll absolute path
 		char dllFullPath[MAX_PATH + 1];
 		GetFullPathName(dllPath, MAX_PATH + 1, dllFullPath, nullptr);
+		OutputDebugString("was");
+		OutputDebugString(dllPath);
+		OutputDebugString("now");
+		OutputDebugString(dllFullPath);
 		if (lstrcmpi(operation, injectString) == 0)
 		{
 			bool injectionSuccess = InjectDLL((DWORD)pid, dllFullPath);
 			if (injectionSuccess)
-				std::cout << "DLL injected successfully" << std::endl;
+				std::cout << "DLL injected to " << processName << "(" << pid << ")" << " successfully" << std::endl;
 			else
 				std::cout << "DLL injection error" << std::endl;
 			return !injectionSuccess;
 		}
-		else if (lstrcmpi(operation, hideString) == 0)
+		else if (lstrcmpi(operation, unloadString) == 0)
 		{
 			bool hideSuccess = UnloadDLL((DWORD)pid, dllFullPath);
 			if (hideSuccess)
