@@ -152,10 +152,6 @@ int main(int argc, char* argv[])
 		// get dll absolute path
 		char dllFullPath[MAX_PATH + 1];
 		GetFullPathName(dllPath, MAX_PATH + 1, dllFullPath, nullptr);
-		OutputDebugString("was");
-		OutputDebugString(dllPath);
-		OutputDebugString("now");
-		OutputDebugString(dllFullPath);
 		if (lstrcmpi(operation, injectString) == 0)
 		{
 			bool injectionSuccess = InjectDLL((DWORD)pid, dllFullPath);
