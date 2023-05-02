@@ -126,7 +126,7 @@ int main(int argc, char* argv[])
 		{
 			std::cout << "Usage: " << argv[0] << " <Operation> <PID> <DLL-Path>" << std::endl;
 			std::cout << "	- <Operation>: inject / hide" << std::endl;
-			std::cout << "	- <PID>:	   Process id of running process" << std::endl;
+			std::cout << "	- <PID>:       Process id of running process" << std::endl;
 			std::cout << "	- <DLL-Path>:  Path to DLL" << std::endl;
 			return 1;
 		}
